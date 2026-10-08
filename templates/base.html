@@ -1,1 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MoneyView | {{ page_title }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="sidebar">
+        <a class="brand" href="{{ url_for('index') }}">
+          <span class="brand-mark">M</span>
+          <span>
+            <span class="eyebrow">Personal finance</span>
+            <strong>MoneyView</strong>
+          </span>
+        </a>
 
+        <nav class="nav" aria-label="Main navigation">
+          <a class="nav-item {{ 'active' if active_page == 'overview' }}" href="{{ url_for('index') }}">Overview</a>
+          <a class="nav-item {{ 'active' if active_page == 'payments' }}" href="{{ url_for('payments_page') }}">Transactions</a>
+          <a class="nav-item {{ 'active' if active_page == 'bills' }}" href="{{ url_for('bills_page') }}">Bills &amp; schedules</a>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <span>Your data is saved on this device.</span>
+        </div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">{{ page_eyebrow }}</p>
+            <h1>{{ page_title }}</h1>
+          </div>
+          {% if active_page == 'payments' %}
+            <a class="primary-btn" href="#add-payment"><span aria-hidden="true">＋</span> Add payment</a>
+          {% elif active_page == 'bills' %}
+            <a class="primary-btn" href="#add-bill"><span aria-hidden="true">＋</span> Add bill</a>
+          {% endif %}
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-stack" role="status">
+              {% for category, message in messages %}
+                <p class="flash {{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>
