@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if next_bill %}
+    <section class="next-payment-banner">
+      <div><span>Next scheduled payment</span><strong>{{ next_bill.name }}</strong></div>
+      <div><strong>{{ next_bill.due_date }}</strong><small>${{ "{:,.2f}".format(next_bill.amount_cents / 100) }} · {{ next_bill.frequency|capitalize }}</small></div>
+    </section>
+  {% endif %}
+
+  <form class="entry-form payment-form" action="{{ url_for('add_payment') }}" method="post" id="add-payment">
+    <div class="form-heading"><h2>Record a Grom payment</h2><span>Updates your remaining balance</span></div>
+    <label>Amount<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></label>
+    <label>Date paid<input name="paid_on" type="date" value="{{ today }}" required /></label>
+    <label class="wide-field">Note <span class="optional">(optional)</span><input name="memo" type="text" maxlength="120" placeholder="Payment note" /></label>
+    <button class="primary-btn" type="submit">Save payment</button>
+  </form>
+
+  <section class="content-section page-section">
+    <div class="section-heading">
+      <div><p class="eyebrow">Recorded activity</p><h2>All transactions</h2></div>
+      <span class="record-count">{{ payments|length }} records</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Payment</th><th>Date paid</th><th>Type</th><th class="amount-cell">Amount</th></tr></thead>
+        <tbody>
+          {% for payment in payments %}
+            <tr>
+              <td><strong>{{ payment.memo or 'Payment' }}</strong></td>
+              <td>{{ payment.paid_on or 'Before tracking' }}</td>
+              <td><span class="type-tag {{ payment.category }}">{{ 'Grom' if payment.category == 'grom' else 'Bill' }}</span></td>
+              <td class="amount-cell">${{ "{:,.2f}".format(payment.amount_cents / 100) }}</td>
+            </tr>
+          {% else %}
+            <tr><td class="empty-state" colspan="4">No payments have been recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="bill-list page-section">
+    {% for bill in bills %}
+      <article class="bill-row">
+        <div class="bill-main"><span class="bill-icon">$</span><div><strong>{{ bill.name }}</strong><span>{{ bill.frequency|capitalize }} · due {{ bill.due_date }}</span></div></div>
+        <strong class="bill-amount">${{ "{:,.2f}".format(bill.amount_cents / 100) }}</strong>
+        <div class="bill-actions">
+          <form action="{{ url_for('mark_bill_paid', bill_id=bill.id) }}" method="post"><button class="small-btn complete-btn" type="submit">Mark paid</button></form>
+          <details class="edit-details">
+            <summary class="small-btn">Change payment</summary>
+            <form class="edit-form" action="{{ url_for('update_bill', bill_id=bill.id) }}" method="post">
+              <label>Bill name<input name="name" value="{{ bill.name }}" required maxlength="80" /></label>
+              <label>Amount<input name="amount" type="number" min="0.01" step="0.01" value="{{ '%.2f'|format(bill.amount_cents / 100) }}" required /></label>
+              <label>Due date<input name="due_date" type="date" value="{{ bill.due_date }}" required /></label>
+              <label>Schedule<select name="frequency"><option value="once" {{ 'selected' if bill.frequency == 'once' }}>One time</option><option value="weekly" {{ 'selected' if bill.frequency == 'weekly' }}>Weekly</option><option value="monthly" {{ 'selected' if bill.frequency == 'monthly' }}>Monthly</option></select></label>
+              <button class="primary-btn" type="submit">Save changes</button>
+            </form>
+          </details>
+          <form action="{{ url_for('delete_bill', bill_id=bill.id) }}" method="post"><button class="small-btn delete-btn" type="submit" aria-label="Remove {{ bill.name }}">Remove</button></form>
+        </div>
+      </article>
+    {% else %}
+      <p class="empty-state bills-empty">No bills scheduled yet. Add one below to track its next due date.</p>
+    {% endfor %}
+  </section>
+
+  <form class="entry-form bill-form" action="{{ url_for('add_bill') }}" method="post" id="add-bill">
+    <div class="form-heading"><h2>Schedule a bill</h2><span>Add a due date and payment amount</span></div>
+    <label>Bill name<input name="name" type="text" maxlength="80" placeholder="For example, phone bill" required /></label>
+    <label>Amount<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></label>
+    <label>Next due date<input name="due_date" type="date" value="{{ today }}" required /></label>
+    <label>Repeat<select name="frequency"><option value="once">One time</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></label>
+    <button class="primary-btn" type="submit">Add bill</button>
+  </form>
+{% endblock %}

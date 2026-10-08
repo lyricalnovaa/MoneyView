@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero-card" id="overview">
+    <div class="hero-copy">
+      <p class="label">Grom balance remaining</p>
+      <h2>${{ "{:,.2f}".format(remaining_cents / 100) }}</h2>
+      <p class="muted">Keep your payoff progress and upcoming bills together in one place.</p>
+      {% if next_bill %}
+        <div class="next-due"><span>Next scheduled payment</span><strong>{{ next_bill.name }} · {{ next_bill.due_date }}</strong></div>
+      {% else %}
+        <div class="next-due"><span>Next scheduled payment</span><strong>No bills scheduled</strong></div>
+      {% endif %}
+    </div>
+
+    <div class="ring-wrap">
+      <div class="ring" style="--progress: {{ percent_paid }}%;">
+        <div class="ring-inner"><strong>{{ "{:.1f}".format(percent_paid) }}%</strong><span>paid</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-grid">
+    <article class="stat-card accent"><p>Grom total</p><h3>${{ "{:,.2f}".format(account.total_owed_cents / 100) }}</h3></article>
+    <article class="stat-card"><p>Paid toward Grom</p><h3>${{ "{:,.2f}".format(paid_cents / 100) }}</h3></article>
+    <article class="stat-card"><p>Upcoming bills</p><h3>{{ bills|length }}</h3></article>
+  </section>
+
+  <section class="progress-panel">
+    <div class="panel-header"><span>Grom payoff progress</span><strong>{{ "{:.1f}".format(percent_paid) }}% complete</strong></div>
+    <div class="progress-track"><div class="progress-fill" style="width: {{ percent_paid }}%;"></div></div>
+    <div class="progress-meta"><span>${{ "{:,.2f}".format(paid_cents / 100) }} paid</span><span>${{ "{:,.2f}".format(remaining_cents / 100) }} remaining</span></div>
+  </section>
+
+  <section class="overview-links" aria-label="Dashboard sections">
+    <a href="{{ url_for('payments_page') }}"><span>Transactions</span><strong>View payment history <b aria-hidden="true">→</b></strong></a>
+    <a href="{{ url_for('bills_page') }}"><span>Bills &amp; schedules</span><strong>Manage upcoming bills <b aria-hidden="true">→</b></strong></a>
+  </section>
+{% endblock %}
